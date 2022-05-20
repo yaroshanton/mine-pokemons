@@ -1,8 +1,8 @@
 import axios from 'axios'
 
-const fetchPokemons = () => {
+const fetchPokemons = (more) => {
     return axios
-        .get(`https://pokeapi.co/api/v2/pokemon/?limit=100&offset=0`)
+        .get(`https://pokeapi.co/api/v2/pokemon/?limit=20&offset=${more}`)
         .then(res => res.data);
 };
 
