@@ -1,21 +1,24 @@
 import * as Action from '../pokemons/actions';
 
-const initialState = {
-  pokemons: [],
-};
+const initialState = []
 
-function pokemonsReducer(state = initialState, action) {
+export function pokemons(state = initialState, action) {
   switch (action.type) {
     case Action.GET_POKEMONS: {
-      return {
-        // [...state, action.data]
-      };
+     return [...state, ...action.payload]
     }
     default: {
       return state;
     }
-  };
-};
-console.log(initialState, 'initialState');
+  }
+}
 
-export default pokemonsReducer;
+export function filter(state = '', action) {
+    switch (action.type) {
+        case Action.CHANGE_FILTER:
+            return action.payload;
+
+        default:
+            return state;
+    }
+}

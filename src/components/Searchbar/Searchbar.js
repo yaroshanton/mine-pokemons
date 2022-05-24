@@ -1,6 +1,10 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { bindActionCreators } from "redux";
+import * as Actions from '../../redux/pokemons/actions'
+import './Searchbar.scss'
 
-export default class Searchbar extends Component {
+ class Searchbar extends Component {
     state = {
         inputValue: '',
     }
@@ -10,22 +14,13 @@ export default class Searchbar extends Component {
             inputValue: e.target.value,
         })
       
-      this.props.onSubmit(e.target.value)
-    }
-
-    handleSubmit = e => {
-        e.preventDefault();
-
-        this.props.onSubmit(this.state.inputValue)
-        this.setState({
-            inputValue: ''
-        })
+      this.props.onChange(e.target.value)
     }
 
     render() {
         return (
             <header className="searchbar">
-                <form className="search-form" onSubmit={this.handleSubmit}>
+                <form className="search-form">
                     <input
                         className="search-form_input"
                         type="text"
@@ -33,12 +28,23 @@ export default class Searchbar extends Component {
                         placeholder="Type pokemon name"
                         value={this.state.inputValue}
                         onChange={this.handleChange}
-                  />
-                  <button type="submit" className="search-form_button">
-                            <span className="search-form-button_label">Search</span>
-                        </button>
+                  /> 
                 </form>
             </header>
         )
     }
+ }
+
+function mapStateToProps() {
+	return {
+		// value: state.contacts.filter
+	}
 }
+
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators({
+    onChange: Actions.changeFilter
+	}, dispatch);
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Searchbar);

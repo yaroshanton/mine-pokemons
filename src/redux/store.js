@@ -1,7 +1,6 @@
 import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
-import rootReducer from './pokemons/reducer';
+import {pokemons , filter} from './pokemons/reducer';
 import {
-  persistStore,
   FLUSH,
   REHYDRATE,
   PAUSE,
@@ -20,7 +19,8 @@ const middleware = [
 
 const store = configureStore({
   reducer: {
-    pokemons: rootReducer,
+    pokemons,
+    filter
   },
   middleware,
 });

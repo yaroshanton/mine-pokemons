@@ -10,54 +10,41 @@ import './styles.scss'
 
 class App extends Component {
     state = {
-        allPokemons: null,
-        visiblePokemons: null,
+        dataPokemon: null,
+        queryName: null,
         quantityPokemons: 20,
-        error: null,
         loading: false,
-        disabled: false,
-        dataPokemon: null
+        showModal: false,
+        error: null,
     }
   
     componentDidMount() { 
       this.fetchPokemons(this.state.quantityPokemons)
     }
 
-  componentDidUpdate(prevProps, prevState) {
-      console.log(this.props.pokemons);
-        const prevQuery = prevState.serchQuery;
-        const nextQuery = this.state.serchQuery;
-
-        if (prevQuery !== nextQuery) {
-            this.fetchPhotos();
-        }
-
-        if (
-            prevState.largeImageURL !== this.state.largeImageURL &&
-            this.state.largeImageURL
-        ) {
-            this.setState({ disabled: true });
+  componentDidUpdate() {
+        if (this.state.dataPokemon) {
             window.addEventListener("keydown", this.closeModalWindow);
         }
     }
 
-    closeModalWindow = (e) => {
+  closeModalWindow = (e) => {
         if (e.code === 'Escape' || e.target.id === 'overlay') {
-            this.setState({ disabled: false, largeImageURL: null });
+            this.setState({ showModal: false, dataPokemon: null });
             window.removeEventListener("keydown", this.closeModalWindow);
         }
     }
 
-    async fetchPokemons(count) {
+    fetchPokemons(count) {
         this.setState({
             loading: true
         })
 
-      await PokemonApi.fetchPokemons(count).then((data) => {  
-                this.props.getAllPokemons(data)
-            })
-          .catch(error => console.log(error))
-          .finally(() => this.setState({ loading: false }))
+      PokemonApi.fetchPokemons(count).then((data) => {  
+        this.props.getAllPokemons(data.results);
+      })
+      .catch(error => console.log(error))
+      .finally(() => this.setState({ loading: false }))
     }
   
   swowMorePokemons = () => {
@@ -69,60 +56,55 @@ class App extends Component {
       this.fetchPokemons(this.state.quantityPokemons)
     }
 
-    handleFormSubmit = name => {
-      console.log(name);
-      const { visiblePokemons } = this.state
-      const filteredVisiblePokemons = visiblePokemons.filter(item => 
-        item.name.includes(name) && item
-      )
-
-      this.setState(prevState => {
-        return {
-          visiblePokemons: filteredVisiblePokemons
-        };
-    });
-    }
-
     handlerOnePokemon = (url) => {
       PokemonApi.fetchPokemon(url)
         .then((data) => {
-          console.log(data);
-              this.setState({ dataPokemon: data });
-          })
+          this.setState({
+            dataPokemon: data,
+            showModal: true
+          });
+        })
         .catch(error => console.log(error))
-        .finally(() => this.setState({ disabled: true }))
     };
 
     render() {
-
-        const { visiblePokemons, error, loading, disabled, dataPokemon } = this.state
+      const { pokemons } = this.props
+        const { error, loading, showModal, dataPokemon } = this.state
 
         return (
             <>
-                {error && <p message={`Whoops, something went wrong: ${error.message}`} />}
-                <Searchbar onSubmit={this.handleFormSubmit} />
-                {visiblePokemons && 
-                    <ImageGallery pokemons={this.props.pokemons} largeImg={this.handlerOnePokemon} />
-                }
-                {visiblePokemons && !loading && 
-                  <button className="button" type="button" onClick={this.swowMorePokemons}>Load more</button>}
-                {loading && <p>Загрузка...</p>}
-            {disabled && <Modal pokemon={dataPokemon} onClose={this.closeModalWindow}/>}
+              {error && <p>`Whoops, something went wrong: ${error.message}`</p>}
+              <Searchbar/>
+              {pokemons.length > 0 && 
+                  <ImageGallery pokemons={pokemons} openDetails={this.handlerOnePokemon} />}
+              {pokemons.length > 0 &&
+                <button className="button-load" type="button" onClick={this.swowMorePokemons}>Load more</button>}
+              {showModal && <Modal pokemon={dataPokemon} onClose={this.closeModalWindow}/>}
+              {loading && <p className='loader'>Loading...</p>}
+              {!loading && pokemons.length === 0 && <p className='loader'>No pokemon found</p>}
             </>
         )
     }
 }
 
-function mapStateToProps({pokemons}) {
+const getVisibleContacts = (pokemons, filter) => {
+    const normalizedFilter = filter.toLocaleLowerCase();
+    return pokemons.filter(({ name }) => name.toLocaleLowerCase().includes(normalizedFilter))
+
+}
+
+function mapStateToProps(state) {
+  const { pokemons, filter } = state;
+  const visibleContacts = getVisibleContacts(pokemons, filter)
+
 	return {
-		pokemons: pokemons.pokemons.results
+		pokemons: visibleContacts
 	}
 }
 
 function mapDispatchToProps(dispatch) {
 	return bindActionCreators({
 		getAllPokemons: Actions.GetAllPokemons,
-		// closeNameDialog: StoreActions.closeNameDialog
 	}, dispatch);
 }
 

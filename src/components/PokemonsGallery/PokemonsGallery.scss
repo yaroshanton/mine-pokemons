@@ -1,0 +1,25 @@
+.pokemons-gallery {
+  display: grid;
+  max-width: calc(100vw - 48px);
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-gap: 16px;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding: 0;
+  list-style: none;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.pokemons-gallery_item {
+  cursor: pointer;
+  text-transform: uppercase;
+  color: #000;
+  opacity: .46;
+  text-align: center;
+  padding: 10px 0;
+}
+
+.pokemons-gallery_item:hover {
+  opacity: 1;
+}
