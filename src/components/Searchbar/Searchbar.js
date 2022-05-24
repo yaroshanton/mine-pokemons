@@ -35,16 +35,10 @@ import './Searchbar.scss'
     }
  }
 
-function mapStateToProps() {
-	return {
-		// value: state.contacts.filter
-	}
-}
-
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
     onChange: Actions.changeFilter
 	}, dispatch);
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Searchbar);
+export default connect(null, mapDispatchToProps)(Searchbar);
